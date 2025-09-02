@@ -11,7 +11,7 @@ use App\Http\Controllers\AbsenController;
 Route::prefix('absen')->controller(AbsenController::class)->group(function (){
     Route::get('/', 'index');
     Route::post('/', 'create');
-    // Route::get('/{id}', 'show');
-    // Route::put('/{id}', 'update');
-    // Route::delete('/{id}', 'delete');
+    Route::get('/{id}', 'show');
+    Route::put('/{id}', 'update');
+    Route::delete('/{id}', 'delete');
 });

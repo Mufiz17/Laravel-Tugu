@@ -25,8 +25,39 @@ class AbsenServiceHandler implements AbsenService
         }
     }
 
+    public function getAbsenById(int $id): ?Absen
+    {
+        try {
+            $data = $this->repository->getById($id);
+            return $data;
+        } catch (Exception) {
+            throw new NotFound();
+        }
+    }
+
     public function createAbsen(array $data): Absen
     {
         return $this->repository->create($data);
+    }
+
+    public function updateAbsen(int $id, array $data): ?Absen
+    {
+        try{
+            $cache = $this->repository->update($id, $data);
+            return $cache;
+        }catch(Exception){
+            throw new NotFound();
+        }
+    }
+
+    public function deleteAbsen(int $id): bool
+    {
+        try{
+            $cache = $this->repository->delete($id);
+            return $cache;
+        }catch(Exception)
+        {
+            throw new NotFound();
+        }
     }
 }
