@@ -2,58 +2,39 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\User\Commands\LoginCommand;
+use App\User\Commands\LogoutCommand;
+use App\User\Commands\RegisterCommand;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    // Register new user
-    public function register(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name'       => 'required|string|max:255',
-            'email'      => 'required|string|email|max:255|unique:users',
-            'password'   => 'required|string|min:6|confirmed',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
-
-        return response()->json(['message' => 'User registered successfully', 'user' => $user], 201);
+    public function __construct(
+        private RegisterCommand $registerCommand,
+        private LoginCommand $loginCommand,
+        private LogoutCommand $logoutCommand
+    ) {
+        $this->registerCommand = $registerCommand;
+        $this->loginCommand = $loginCommand;
+        $this->logoutCommand = $logoutCommand;
     }
 
-    // Login user and return JWT token
-    public function login(Request $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $credentials = $request->only('email', 'password');
-
-        if (!$token = auth('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        return $this->respondWithToken($token);
+        return $this->registerCommand->execute($request->validated(), 201);
     }
 
-    // Get user profile
-    public function profile()
+    public function login(LoginRequest $request): JsonResponse
     {
-        return response()->json(auth('api')->user());
+        return $this->loginCommand->execute($request->validated());
     }
 
-    // Logout user (invalidate token)
-    public function logout()
+    public function logout(): JsonResponse
     {
-        auth('api')->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
+        return $this->logoutCommand->execute();
     }
 }
