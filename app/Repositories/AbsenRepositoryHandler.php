@@ -20,4 +20,10 @@ class AbsenRepositoryHandler implements AbsenRepository
         Redis::setex($cacheKey, 300, serialize($data));
         return $data;
     }
+
+    public function create(array $data): Absen
+    {
+        Redis::del(['absen:all', 'absen:{id}']);
+        return Absen::create($data);
+    }
 }
