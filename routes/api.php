@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AbsenController;
+use App\Http\Controllers\API\AuthController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -14,4 +15,15 @@ Route::prefix('absen')->controller(AbsenController::class)->group(function (){
     Route::get('/{id}', 'show');
     Route::put('/{id}', 'update');
     Route::delete('/{id}', 'delete');
+});
+
+Route::prefix('auth')->controller(AuthController::class)->group(function () {
+    Route::post('register','register');
+    Route::post('login','login');
+
+    Route::middleware('jwt.auth')->group(function () {
+        Route::post('profile','profile');
+        Route::post('logout','logout');
+        Route::post('refresh','refresh');
+    });
 });
