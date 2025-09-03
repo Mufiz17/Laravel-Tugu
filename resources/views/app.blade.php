@@ -11,7 +11,6 @@
 
 <body class="antialiased">
     <div id="app"></div>
-    {{-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> --}}
 </body>
 
 </html>

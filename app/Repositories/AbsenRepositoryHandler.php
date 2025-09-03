@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Helper\RedisHelper;
 use App\Models\Absen;
 use Illuminate\Support\Facades\Redis;
 use App\Interfaces\Repositories\AbsenRepository;
@@ -11,42 +12,30 @@ class AbsenRepositoryHandler implements AbsenRepository
 {
     public function getAll(): Collection
     {
-        $cacheKey = 'absen:all';
-        $cache = Redis::get($cacheKey);
-        if ($cache !== null) {
-            return unserialize($cache);
-        }
-        $cache = Absen::get();
-        Redis::setex($cacheKey, 300, serialize($cache));
-        return $cache;
+        return RedisHelper::redis_cache("absen:all", function () {
+            return Absen::get();
+        }, 300);
     }
 
     public function getById(int $id): ?Absen
     {
-        $cacheKey = 'absen:id';
-        $cache = Redis::get($cacheKey);
-
-        if ($cache !== null) {
-            return unserialize($cache);
-        }
-
-        $cache = Absen::find($id);
-        Redis::setex($cacheKey, 300, serialize($cache));
-        return $cache;
+        return RedisHelper::redis_cache("absen:id:$id", function () use ($id) {
+            return Absen::find($id);
+        }, 300);
     }
 
     public function create(array $data): Absen
     {
-        Redis::del(['absen:all', 'absen:id']);
+        RedisHelper::redis_forget('absen:*');
         return Absen::create($data);
     }
 
     public function update(int $id, array $data): ?Absen
     {
         $cache = $this->getById($id);
-        if ($cache){
+        if ($cache) {
             $cache->update($data);
-            Redis::del(['absen:all', 'absen:id']);
+            RedisHelper::redis_forget('absen:*');
         }
         return $cache;
     }
@@ -54,7 +43,7 @@ class AbsenRepositoryHandler implements AbsenRepository
     public function delete(int $id): bool
     {
         $cache = $this->getById($id)->delete();
-        Redis::del(['absen:all', 'absen:id']);
+        RedisHelper::redis_forget('absen:*');
         return $cache;
     }
 }
