@@ -33,6 +33,13 @@ class AuthController extends Controller
         return $this->loginCommand->execute($request->validated());
     }
 
+
+    public function profile(Request $request)
+    {
+        return response()->json($request->user());
+    }
+
+
     public function logout(): JsonResponse
     {
         return $this->logoutCommand->execute();

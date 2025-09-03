@@ -25,5 +25,6 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
         Route::post('profile','profile');
         Route::post('logout','logout');
         Route::post('refresh','refresh');
+        Route::post('/profile', 'profile');
     });
 });
