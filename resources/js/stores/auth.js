@@ -1,47 +1,47 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import axios from '../bootstrap'
+import { useRouter } from 'vue-router';
+import router from '../router'
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         user: null,
-        token: localStorage.getItem('token') || null,
         loading: false,
-        error: null,
+        initialized: false,
     }),
     getters: {
-        isAuthenticated: (s) => !!s.token,
-        isAdmin: (s) => s.user?.utype === 'adm',
+        isAuthenticated: (state) => !!state.user,
+        isAdmin: (state) => state.user?.utype === 'adm',
     },
     actions: {
-        async register(payload) {
-            this.error = null
-            await axios.post('/auth/register', payload)
-        },
-        async login(credentials) {
-            this.loading = true
-            this.error = null
+        async init() {
+            if (this.initialized) return
+            this.initialized = true
+
             try {
-                const { data } = await axios.post('/auth/login', credentials)
-                this.token = data.access_token
-                localStorage.setItem('token', this.token)
-                axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
-                await this.getProfile()
+                await this.fetchUser()
+            } catch {
+                this.user = null
+            }
+        },
+        async fetchUser() {
+            this.loading = true
+            try {
+                const { data } = await axios.get('/profile', { withCredentials: true })
+                this.user = data
             } catch (e) {
-                this.error = e?.response?.data?.message || 'Login gagal'
-                throw e
+                this.user = null
             } finally {
                 this.loading = false
             }
         },
-        async getProfile() {
-            const { data } = await axios.post('/auth/profile')
-            this.user = data
+        async login(form) {
+            await axios.post('/login', form)
+            await this.fetchUser()
         },
         async logout() {
-            try { await axios.post('/auth/logout') } catch { }
+            await axios.post('/logout', {}, { withCredentials: true })
             this.user = null
-            this.token = null
-            delete axios.defaults.headers.common['Authorization']
-            localStorage.removeItem('token')
-        }
+            router.push('/login')
+        },
     }
 })

@@ -26,7 +26,7 @@ class AbsenRepositoryHandler implements AbsenRepository
 
     public function create(array $data): Absen
     {
-        RedisHelper::redis_forget('absen:*');
+        RedisHelper::redis_forget(["absen:all"]);
         return Absen::create($data);
     }
 
@@ -35,7 +35,7 @@ class AbsenRepositoryHandler implements AbsenRepository
         $cache = $this->getById($id);
         if ($cache) {
             $cache->update($data);
-            RedisHelper::redis_forget('absen:*');
+            RedisHelper::redis_forget(["absen:all", "absen:id:{$id}"]);
         }
         return $cache;
     }
@@ -43,7 +43,7 @@ class AbsenRepositoryHandler implements AbsenRepository
     public function delete(int $id): bool
     {
         $cache = $this->getById($id)->delete();
-        RedisHelper::redis_forget('absen:*');
+        RedisHelper::redis_forget(["absen:all", "absen:id:{$id}"]);
         return $cache;
     }
 }

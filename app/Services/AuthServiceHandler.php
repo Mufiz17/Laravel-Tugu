@@ -6,6 +6,7 @@ use App\Interfaces\Repositories\AuthRepository;
 use App\Interfaces\Services\AuthService;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Validator;
 
 class AuthServiceHandler implements AuthService
@@ -28,22 +29,27 @@ class AuthServiceHandler implements AuthService
         if (!$token = auth('api')->attempt($data)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
         return $this->respondWithToken($token);
     }
 
     public function logout()
     {
-        auth('api')->logout();
-        return response()->json(['message' => 'Successfully logged out']);
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out'])->withoutCookie('jwt');
     }
 
     public function respondWithToken($token)
     {
-        return response()->json([
-            'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => auth('api')->factory()->getTTL() * 60,
-        ]);
+        $cookie = cookie(
+            'jwt',
+            $token,
+            auth('api')->factory()->getTTL(), // menit
+            '/',
+            null,
+            false, // ganti ke true kalau sudah pakai https
+            true   // HttpOnly
+        );
+
+        return response()->json(['message' => 'Login berhasil'])->cookie($cookie);
     }
 }

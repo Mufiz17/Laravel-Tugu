@@ -17,14 +17,12 @@ Route::prefix('absen')->controller(AbsenController::class)->group(function (){
     Route::delete('/{id}', 'delete');
 });
 
-Route::prefix('auth')->controller(AuthController::class)->group(function () {
+Route::controller(AuthController::class)->group(function () {
     Route::post('register','register');
     Route::post('login','login');
 
-    Route::middleware('jwt.auth')->group(function () {
-        Route::post('profile','profile');
+    Route::middleware(['jwt.cookie','jwt.auth'])->group(function () {
+        Route::get('profile','profile');
         Route::post('logout','logout');
-        Route::post('refresh','refresh');
-        Route::post('/profile', 'profile');
     });
 });

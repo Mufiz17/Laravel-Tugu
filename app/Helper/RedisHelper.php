@@ -9,7 +9,7 @@ class RedisHelper
 
     public static function redis_cache(string $key, callable $callback, int $ttl = 300)
     {
-        $key = "app:$key"; // prefix key
+        $key = "app:$key"; 
         $cache = Redis::get($key);
 
         if ($cache !== null) {

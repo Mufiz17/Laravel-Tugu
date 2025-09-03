@@ -1,23 +1,20 @@
 import axios from 'axios'
+import router from './router'
+
 axios.defaults.baseURL = '/api'
+axios.defaults.withCredentials = true
 axios.defaults.headers.common['Accept'] = 'application/json'
 
-// inject Authorization dari localStorage jika ada
-const token = localStorage.getItem('token')
-if (token) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-}
-
 // auto redirect ke /login kalau 401
-import router from './router'
 axios.interceptors.response.use(
-    r => r,
-    err => {
-        if (err?.response?.status === 401) {
-            localStorage.removeItem('token')
-            router.push('/login')
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            if (router.currentRoute.value.path !== '/login') {
+                router.push('/login')
+            }
         }
-        return Promise.reject(err)
+        return Promise.reject(error)
     }
 )
 export default axios

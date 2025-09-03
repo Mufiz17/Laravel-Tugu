@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import axios from '../bootstrap'
 
 export const useAbsenStore = defineStore('absen', {
     state: () => ({
         items: [],
-        meta: null,
         loading: false,
     }),
     actions: {

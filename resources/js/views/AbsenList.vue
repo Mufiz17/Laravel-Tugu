@@ -74,7 +74,7 @@ onMounted(() => fetch());
                 </tbody>
             </table>
         </div>
-        <div class="flex justify-between items-center mt-4" v-if="meta">
+        <!-- <div class="flex justify-between items-center mt-4" v-if="meta">
             <button
                 :disabled="!meta.prev_page_url"
                 @click="fetch(meta.current_page - 1)"
@@ -90,6 +90,6 @@ onMounted(() => fetch());
             >
                 Next
             </button>
-        </div>
+        </div> -->
     </div>
 </template>
