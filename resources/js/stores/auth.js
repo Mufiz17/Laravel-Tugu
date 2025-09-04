@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', {
         user: null,
         loading: false,
         initialized: false,
+        errror: null,
     }),
     getters: {
         isAuthenticated: (state) => !!state.user,
@@ -23,6 +24,16 @@ export const useAuthStore = defineStore('auth', {
                 this.user = null
             }
         },
+        async register(form) {
+            this.error = null
+            try {
+                const { data } = await axios.post('/register', form)
+                return data
+            } catch (err) {
+                this.error = err.response?.data?.message || 'Register gagal'
+                throw err
+            }
+        },
         async fetchUser() {
             this.loading = true
             try {
@@ -30,18 +41,31 @@ export const useAuthStore = defineStore('auth', {
                 this.user = data
             } catch (e) {
                 this.user = null
+                this.error = e.response?.data?.message || "Gagal mengambil data"
+                throw e
             } finally {
                 this.loading = false
             }
         },
         async login(form) {
-            await axios.post('/login', form)
-            await this.fetchUser()
+            try {
+                await axios.post('/login', form)
+                await this.fetchUser()
+            } catch (e) {
+                this.error = e.response?.data?.message || "Login gagal"
+                throw e
+            }
+
         },
         async logout() {
-            await axios.post('/logout', {}, { withCredentials: true })
-            this.user = null
-            router.push('/login')
+            try {
+                await axios.post('/logout', {}, { withCredentials: true })
+                this.user = null
+                router.push('/login')
+            } catch (e) {
+                this.error = e.response?.data?.message || "Logout Gagal"
+                throw e
+            }
         },
     }
 })

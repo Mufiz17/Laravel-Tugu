@@ -7,14 +7,15 @@ const auth = useAuthStore();
 const router = useRouter();
 const form = reactive({ email: "", password: "" });
 const loading = ref(false);
+const error = ref(null)
 
 const submit = async () => {
     loading.value = true;
     try {
         await auth.login(form);
         router.push("/");
-    } finally {
-        loading.value = false;
+    } catch (e) {
+        error.value = auth.error
     }
 };
 </script>
@@ -41,14 +42,14 @@ const submit = async () => {
                         required
                     />
                 </div>
-                <p v-if="auth.error" class="text-red-600 text-sm mt-2">
-                    {{ auth.error }}
+                <p v-if="error" class="text-red-600 text-sm mt-2">
+                    {{ error }}
                 </p>
                 <button
                     :disabled="auth.loading"
                     class="mt-4 w-full rounded-xl px-4 py-2 bg-black text-white"
                 >
-                    {{ auth.loading ? "Loading..." : "Masuk" }}
+                  {{ auth.loading ? "Loading..." : "Masuk" }}  
                 </button>
             </form>
             <router-link to="/register" class="text-sm underline"
