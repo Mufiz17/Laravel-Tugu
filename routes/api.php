@@ -9,20 +9,24 @@ use App\Http\Controllers\API\AuthController;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::prefix('absen')->controller(AbsenController::class)->group(function (){
-    Route::get('/', 'index');
-    Route::post('/', 'create');
-    Route::get('/{id}', 'show');
-    Route::put('/{id}', 'update');
-    Route::delete('/{id}', 'delete');
+Route::prefix('absen')->controller(AbsenController::class)->group(function () {
+    Route::middleware(['jwt.cookie', 'jwt.auth'])->group(function () {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+    });
+    Route::middleware(['jwt.cookie', 'jwt.auth', 'role:adm'])->group(function () {
+        Route::post('/', 'create');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
 });
 
 Route::controller(AuthController::class)->group(function () {
-    Route::post('register','register');
-    Route::post('login','login');
+    Route::post('register', 'register');
+    Route::post('login', 'login');
 
-    Route::middleware(['jwt.cookie','jwt.auth'])->group(function () {
-        Route::get('profile','profile');
-        Route::post('logout','logout');
+    Route::middleware(['jwt.cookie', 'jwt.auth'])->group(function () {
+        Route::get('profile', 'profile');
+        Route::post('logout', 'logout');
     });
 });

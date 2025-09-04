@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\JwtCookieMiddleware;
+use App\Http\Middleware\RoleCheckMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,7 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'jwt.cookie' => JwtCookieMiddleware::class
+            'jwt.cookie' => JwtCookieMiddleware::class,
+            'role' => RoleCheckMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

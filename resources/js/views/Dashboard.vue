@@ -26,9 +26,7 @@
             </div>
         </div>
 
-        <!-- Cards -->
         <div class="grid gap-6 md:grid-cols-2">
-            <!-- Card Data Karyawan -->
             <router-link
                 to="/absen"
                 class="group block bg-white rounded-2xl shadow-sm p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out"
@@ -43,7 +41,6 @@
                 </p>
             </router-link>
 
-            <!-- Card Menu Admin -->
             <div
                 v-if="auth.isAdmin"
                 class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out"
