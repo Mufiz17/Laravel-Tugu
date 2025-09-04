@@ -7,7 +7,7 @@ const auth = useAuthStore();
 const router = useRouter();
 const form = reactive({ email: "", password: "" });
 const loading = ref(false);
-const error = ref(null)
+const error = ref(null);
 
 const submit = async () => {
     loading.value = true;
@@ -15,10 +15,13 @@ const submit = async () => {
         await auth.login(form);
         router.push("/");
     } catch (e) {
-        error.value = auth.error
+        error.value = auth.error;
+    } finally {
+        loading.value = false;
     }
 };
 </script>
+
 <template>
     <div class="min-h-screen flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white rounded-2xl shadow p-6 space-y-4">
@@ -46,10 +49,25 @@ const submit = async () => {
                     {{ error }}
                 </p>
                 <button
-                    :disabled="auth.loading"
-                    class="mt-4 w-full rounded-xl px-4 py-2 bg-black text-white"
+                    type="submit"
+                    :disabled="loading"
+                    class="mt-4 w-full rounded-xl px-4 py-2 text-white transition-colors duration-300 
+                        disabled:opacity-60 disabled:cursor-not-allowed
+                        bg-black hover:bg-gray-800 active:bg-gray-900"
                 >
-                  {{ auth.loading ? "Loading..." : "Masuk" }}  
+                    <span v-if="loading" class="flex items-center justify-center gap-2">
+                        <svg
+                            class="animate-spin h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+                        </svg>
+                        Loading...
+                    </span>
+                    <span v-else>Masuk</span>
                 </button>
             </form>
             <router-link to="/register" class="text-sm underline"
